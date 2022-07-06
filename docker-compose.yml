@@ -3,21 +3,21 @@ version: "3.3"
 services:
 
   coredns:
-    image: "coredns/coredns:1.9.3"
-    restart: "unless-stopped"
-    command: "-conf /root/Corefile"
+    image: coredns/coredns:1.9.3
+    restart: unless-stopped
+    command: -conf /root/Corefile
     ports:
-      - "53:53/udp"
+      - 53:53/udp
     volumes:
-      - "/mnt/d/docker/coredns/root:/root"
+      - /mnt/d/docker/coredns/root:/root:ro
     labels:
-      - "traefik.enable=false"
+      - traefik.enable=false
     network_mode: bridge
 
 
   hub-agent:
     image: ghcr.io/traefik/hub-agent-traefik:v0.7.0
-    restart: "on-failure"
+    restart: on-failure
     command:
       - run
       - --hub.token=${TRAEFIK_HUB_TOKEN}
