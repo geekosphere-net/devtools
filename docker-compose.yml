@@ -7,12 +7,67 @@ services:
     restart: unless-stopped
     command: -conf /root/Corefile
     ports:
+      - 53:53/tcp
       - 53:53/udp
     volumes:
-      - /mnt/d/docker/coredns/root:/root:ro
+      - ./coredns:/root:ro
     labels:
       - traefik.enable=false
     network_mode: bridge
+
+
+  traefik:
+    image: traefik:v2.7
+    restart: unless-stopped
+    env_file:
+      - ./traefik/traefik.env # contains the GoDaddy API Key and Secret
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=true
+      - '--providers.docker.defaultRule=Host(`{{if index .Labels "com.docker.compose.service" }}{{ index .Labels "com.docker.compose.service" }}.geekosphere.net{{else}}{{ trimPrefix `/` .Name }}.geekosphere.net{{end}}`)'
+      - --entrypoints.webinsecure.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.traefik.address=:8080
+      - --providers.file.directory=/traefik/config
+      - --providers.file.watch=true
+      - --experimental.hub=true
+      - --hub.tls.insecure=true
+      - --metrics.prometheus.addrouterslabels=true
+      - --certificatesresolvers.wildcard-godaddy.acme.dnschallenge=true
+      - --certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.provider=godaddy
+      - --certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.delayBeforeCheck=0
+      - --certificatesresolvers.wildcard-godaddy.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.wildcard-godaddy.acme.storage=/traefik/certs/acme.json
+      - --log.level=WARN
+      #- --accessLog=true
+      #- --accessLog.filePath=/traefik/logs/access.log
+      #- --accessLog.bufferingSize=100
+      #- --accessLog.filters.statusCodes=204-299,400-499,400-499
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/traefik
+    labels:
+      - traefik.enable=true
+      # HTTPS redirect
+      - traefik.http.routers.http-catchall.entrypoints=webinsecure
+      - traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)
+      - traefik.http.routers.http-catchall.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      # HTTP Router
+      - traefik.http.routers.traefik-secure.entrypoints=websecure
+      - traefik.http.routers.traefik-secure.rule=Host(`traefik.geekosphere.net`)
+      - traefik.http.routers.traefik-secure.tls=true
+      - traefik.http.routers.traefik-secure.tls.certresolver=wildcard-godaddy
+      - traefik.http.routers.traefik-secure.tls.domains[0].main=geekosphere.net
+      - traefik.http.routers.traefik-secure.tls.domains[0].sans=*.geekosphere.net
+      - traefik.http.routers.traefik-secure.service=api@internal
+    networks:
+      - proxy
 
 
   hub-agent:
@@ -32,44 +87,14 @@ services:
       - proxy
 
 
-  traefik:
-    image: "traefik:v2.7"
-    restart: "unless-stopped"
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=true"
-      - '--providers.docker.defaultRule=Host(`{{if index .Labels "com.docker.compose.service" }}{{ index .Labels "com.docker.compose.service" }}.leveraging.com{{else}}{{ trimPrefix `/` .Name }}.leveraging.com{{end}}`)'
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.file.directory=/config/"
-      - "--providers.file.watch=true"
-      - "--experimental.hub=true"
-      - "--hub.tls.insecure=true"
-      - "--metrics.prometheus.addrouterslabels=true"
-#      - "--log.level=DEBUG"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/mnt/d/docker/traefik/config:/config"
-    labels:
-      - "traefik.http.routers.api.rule=Host(`traefik.leveraging.com`)"
-      - "traefik.http.routers.api.tls=true"
-      - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.services.api.loadbalancer.server.port=8080"
-    networks:
-      - proxy
-
-
   httpbin:
     image: kennethreitz/httpbin:latest
     restart: unless-stopped
     labels:
-      - traefik.http.routers.httpbin.rule=Host(`httpbin.leveraging.com`)
-      - traefik.http.routers.httpbin.tls=true
-      - traefik.http.services.httpbin-devtools.loadbalancer.server.port=80
+        - traefik.http.routers.httpbin.tls=true
+        - traefik.http.routers.httpbin.tls.certresolver=wildcard-godaddy
+    depends_on:
+      - devtools-traefik
     networks:
       - proxy
 
@@ -79,9 +104,10 @@ services:
     #image: "machaval/dw-playground:2.3.1-SNAPSHOT"
     restart: unless-stopped
     labels:
-      - traefik.http.routers.dwplay.rule=Host(`dwplay.leveraging.com`)
       - traefik.http.routers.dwplay.tls=true
-      - traefik.http.services.dwplay-devtools.loadbalancer.server.port=8081
+      - traefik.http.routers.dwplay.tls.certresolver=wildcard-godaddy
+    depends_on:
+      - devtools-traefik
     networks:
       - proxy
 

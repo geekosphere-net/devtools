@@ -1,0 +1,30 @@
+;$ORIGIN leveraging.com.
+$ttl 38400
+leveraging.com.	IN	SOA	ns.leveraging.com. devin.leveraging.com. (
+			1510670878
+			10800
+			3600
+			604800
+			38400 )
+                                MX      10      localhost.
+leveraging.com.			IN	NS	ns.leveraging.com.
+@				IN	A	127.0.0.1
+; resolve NS to localhost
+ns.leveraging.com.		IN	A	127.0.0.1
+; REAL servers
+www.leveraging.com.		IN	A	97.74.249.61
+webmail.leveraging.com.		IN	CNAME	ghs.google.com
+;
+; VMs
+vmhost.leveraging.com.		IN	A	192.168.142.1
+vmgateway.leveraging.com.	IN	A	192.168.142.2
+;
+; WSL
+wslhost.leveraging.com.		IN	A	172.20.32.1
+;
+; DOCKER
+traefik.leveraging.com.		IN	CNAME	@
+;
+; DEFAULT
+*.leveraging.com.		IN	CNAME	@
+

@@ -1,0 +1,32 @@
+#
+# Default DNS server
+
+.:53 {
+	errors
+	health
+	ready
+	#forward . 8.8.8.8
+	forward . 192.168.168.250 8.8.8.8 {
+		policy sequential
+		prefer_udp
+	}
+	cache 30
+	loop
+	reload
+	#loadbalance
+}
+
+
+#
+# Load local DNS
+
+leveraging.com:53 {
+	file /root/leveraging.com.hosts
+	errors
+}
+
+geekosphere.net:53 {
+	file /root/geekosphere.net.hosts
+	errors
+}
+
