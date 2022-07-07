@@ -1,3 +1,4 @@
 *.env
 **/acme.json
 **/access.log
+**/private/*key
