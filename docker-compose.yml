@@ -2,24 +2,8 @@ version: "3.3"
 
 services:
 
-  coredns:
-    image: coredns/coredns:1.9.3
-    restart: unless-stopped
-    command: -conf /root/Corefile
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 853:853/tcp
-      - 4433:443/tcp
-    volumes:
-      - ./coredns:/root:ro
-    labels:
-      - traefik.enable=false
-    network_mode: bridge
-
-
   traefik:
-    image: traefik:v2.7
+    image: traefik:v2.8
     restart: unless-stopped
     env_file:
       - ./traefik/traefik.env # contains the GoDaddy API Key and Secret
@@ -28,7 +12,7 @@ services:
       - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=true
-      - '--providers.docker.defaultRule=Host(`{{if index .Labels "com.docker.compose.service" }}{{ index .Labels "com.docker.compose.service" }}.geekosphere.net{{else}}{{ trimPrefix `/` .Name }}.geekosphere.net{{end}}`)'
+      - --providers.docker.defaultRule=Host(`{{if index .Labels "com.docker.compose.service" }}{{ index .Labels "com.docker.compose.service" }}.l.geekosphere.net{{else}}{{ trimPrefix `/` .Name }}.l.geekosphere.net{{end}}`)
       - --entrypoints.webinsecure.address=:80
       - --entrypoints.websecure.address=:443
       - --entrypoints.traefik.address=:8080
@@ -62,11 +46,11 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
       # HTTP Router
       - traefik.http.routers.traefik-secure.entrypoints=websecure
-      - traefik.http.routers.traefik-secure.rule=Host(`traefik.geekosphere.net`)
+      - traefik.http.routers.traefik-secure.rule=Host(`traefik.l.geekosphere.net`)
       - traefik.http.routers.traefik-secure.tls=true
       - traefik.http.routers.traefik-secure.tls.certresolver=wildcard-godaddy
-      - traefik.http.routers.traefik-secure.tls.domains[0].main=geekosphere.net
-      - traefik.http.routers.traefik-secure.tls.domains[0].sans=*.geekosphere.net
+      - traefik.http.routers.traefik-secure.tls.domains[0].main=l.geekosphere.net
+      - traefik.http.routers.traefik-secure.tls.domains[0].sans=*.l.geekosphere.net
       - traefik.http.routers.traefik-secure.service=api@internal
     networks:
       - proxy
@@ -83,6 +67,19 @@ services:
       - --traefik.tls.insecure=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - devtools-traefik
+    networks:
+      - proxy
+
+
+  whoami:
+    image: traefik/whoami
+    labels:
+        - traefik.http.routers.whoami.tls=true
+        - traefik.http.routers.whoami.tls.certresolver=wildcard-godaddy
+        - traefik.http.routers.whoami.tls.domains[0].main=l.geekosphere.net
+        - traefik.http.routers.whoami.tls.domains[0].sans=*.l.geekosphere.net
     depends_on:
       - devtools-traefik
     networks:
