@@ -18,4 +18,16 @@ docker compose up -d
 ```
 (note: docker version 20.10.16)
 
+# Testing
+You can then test this by running the `whoami` container.
+You can do this by running
+```
+docker run --rm -itd --name whoami --network proxy --label traefik.http.routers.whoami.tls=true traefik/whoami:latest
+```
+or by using the included script
+```
+./proxy-container.sh traefik/whoami:latest
+```
+Validate by checking the container at
+https://whoami.l.geeksophere.net
 

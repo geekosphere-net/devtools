@@ -73,19 +73,6 @@ services:
       - proxy
 
 
-  whoami:
-    image: traefik/whoami
-    labels:
-        - traefik.http.routers.whoami.tls=true
-        - traefik.http.routers.whoami.tls.certresolver=wildcard-godaddy
-        - traefik.http.routers.whoami.tls.domains[0].main=l.geekosphere.net
-        - traefik.http.routers.whoami.tls.domains[0].sans=*.l.geekosphere.net
-    depends_on:
-      - devtools-traefik
-    networks:
-      - proxy
-
-
   httpbin:
     image: kennethreitz/httpbin:latest
     restart: unless-stopped
