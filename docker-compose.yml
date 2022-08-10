@@ -68,7 +68,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - devtools-traefik
+      - traefik
     networks:
       - proxy
 
@@ -80,7 +80,7 @@ services:
         - traefik.http.routers.httpbin.tls=true
         - traefik.http.routers.httpbin.tls.certresolver=wildcard-godaddy
     depends_on:
-      - devtools-traefik
+      - traefik
     networks:
       - proxy
 
@@ -93,7 +93,7 @@ services:
       - traefik.http.routers.dwplay.tls=true
       - traefik.http.routers.dwplay.tls.certresolver=wildcard-godaddy
     depends_on:
-      - devtools-traefik
+      - traefik
     networks:
       - proxy
 
