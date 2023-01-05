@@ -27,6 +27,7 @@ services:
       - --certificatesresolvers.wildcard-godaddy.acme.email=${ACME_EMAIL}
       - --certificatesresolvers.wildcard-godaddy.acme.storage=/traefik/certs/acme.json
       - --log.level=WARN
+      - --log.level=WARN
       #- --accessLog=true
       #- --accessLog.filePath=/traefik/logs/access.log
       #- --accessLog.bufferingSize=100
@@ -57,7 +58,7 @@ services:
 
 
   hub-agent:
-    image: ghcr.io/traefik/hub-agent-traefik:v0.7.0
+    image: ghcr.io/traefik/hub-agent-traefik:v1.0.0
     restart: on-failure
     command:
       - run
@@ -68,7 +69,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - traefik
+      traefik:
+        condition: service_started
+        #condition: service_healthy
+        #condition: service_completed_successfully
     networks:
       - proxy
 
@@ -86,7 +90,8 @@ services:
 
 
   dwplay:
-    image: dnr/dwplay:2.5.0-SNAPSHOT
+    image: dnr/dwplay:V1.0.24-V2.5.0-SNAPSHOT
+    #image: dnr/dwplay:2.5.0-SNAPSHOT
     #image: "machaval/dw-playground:2.3.1-SNAPSHOT"
     restart: unless-stopped
     labels:
