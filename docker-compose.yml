@@ -102,6 +102,20 @@ services:
     networks:
       - proxy
 
+  flex-gateway:
+    image: mulesoft/flex-gateway
+    restart: unless-stopped
+    labels:
+      - traefik.http.routers.flex-gateway.tls=true
+      - traefik.http.routers.flex-gateway.tls.certresolver=wildcard-godaddy
+      - traefik.http.services.flex-gateway-detools.loadbalancer.server.port=8081
+    volumes:
+      - /mnt/d/docker/flex-gateway:/usr/local/share/mulesoft/flex-gateway/conf.d
+    depends_on:
+      - traefik
+    networks:
+      - proxy
+
 networks:
   proxy:
     external: true
