@@ -3,7 +3,7 @@ version: "3.3"
 services:
 
   traefik:
-    image: traefik:v2.8
+    image: traefik:v2.9
     restart: unless-stopped
     env_file:
       - ./traefik/traefik.env # contains the GoDaddy API Key and Secret
@@ -24,9 +24,9 @@ services:
       - --certificatesresolvers.wildcard-godaddy.acme.dnschallenge=true
       - --certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.provider=godaddy
       - --certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.delayBeforeCheck=0
+      - --certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.resolvers=1.1.1.1:53,8.8.8.8:53
       - --certificatesresolvers.wildcard-godaddy.acme.email=${ACME_EMAIL}
       - --certificatesresolvers.wildcard-godaddy.acme.storage=/traefik/certs/acme.json
-      - --log.level=WARN
       - --log.level=WARN
       #- --accessLog=true
       #- --accessLog.filePath=/traefik/logs/access.log
@@ -50,8 +50,8 @@ services:
       - traefik.http.routers.traefik-secure.rule=Host(`traefik.l.geekosphere.net`)
       - traefik.http.routers.traefik-secure.tls=true
       - traefik.http.routers.traefik-secure.tls.certresolver=wildcard-godaddy
-      - traefik.http.routers.traefik-secure.tls.domains[0].main=l.geekosphere.net
-      - traefik.http.routers.traefik-secure.tls.domains[0].sans=*.l.geekosphere.net
+      - traefik.http.routers.traefik-secure.tls.domains[0].main=*.l.geekosphere.net
+      - traefik.http.routers.traefik-secure.tls.domains[0].sans=l.geekosphere.net
       - traefik.http.routers.traefik-secure.service=api@internal
     networks:
       - proxy
@@ -109,6 +109,8 @@ services:
       - traefik.http.routers.flex-gateway.tls=true
       - traefik.http.routers.flex-gateway.tls.certresolver=wildcard-godaddy
       - traefik.http.services.flex-gateway-detools.loadbalancer.server.port=8081
+    environment:
+      - FLEX_NAME=drichards-2
     volumes:
       - /mnt/d/docker/flex-gateway:/usr/local/share/mulesoft/flex-gateway/conf.d
     depends_on:
