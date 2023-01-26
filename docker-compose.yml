@@ -20,6 +20,7 @@ services:
       - --providers.file.watch=true
       - --experimental.hub=true
       - --hub.tls.insecure=true
+      - --serverstransport.insecureskipverify=true
       - --metrics.prometheus.addrouterslabels=true
       - --certificatesresolvers.wildcard-godaddy.acme.dnschallenge=true
       - --certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.provider=godaddy
@@ -103,14 +104,15 @@ services:
       - proxy
 
   flex-gateway:
-    image: mulesoft/flex-gateway
+    image: mulesoft/flex-gateway:latest
     restart: unless-stopped
     labels:
       - traefik.http.routers.flex-gateway.tls=true
       - traefik.http.routers.flex-gateway.tls.certresolver=wildcard-godaddy
-      - traefik.http.services.flex-gateway-detools.loadbalancer.server.port=8081
+      - traefik.http.services.flex-gateway-detools.loadbalancer.server.port=8082
+      - traefik.http.services.flex-gateway-detools.loadbalancer.server.scheme=https
     environment:
-      - FLEX_NAME=drichards-2
+      - FLEX_NAME=devtools-flex-gateway-1
     volumes:
       - /mnt/d/docker/flex-gateway:/usr/local/share/mulesoft/flex-gateway/conf.d
     depends_on:
