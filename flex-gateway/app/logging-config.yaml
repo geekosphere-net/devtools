@@ -1,0 +1,21 @@
+apiVersion: gateway.mulesoft.com/v1alpha1
+kind: Configuration
+metadata:
+  name: logging-config
+spec:
+  logging:
+    outputs:
+    - name: default
+      type: file
+      parameters:
+        file: /usr/local/share/mulesoft/flex-gateway/conf.d/flex-gateway.log
+        format: template
+        template: |
+          [{logger}][{level}][{kind}] {message}
+    runtimeLogs:
+      logLevel: warn
+      outputs:
+      - default
+    accessLogs:
+      outputs:
+      - default

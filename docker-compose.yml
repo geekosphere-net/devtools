@@ -1,6 +1,17 @@
 version: "3.3"
 
 services:
+  coredns:
+    image: coredns/coredns:1.9.3
+    restart: always
+    command: -conf /root/Corefile
+    ports:
+      - 53:53/udp
+    volumes:
+      - /mnt/d/docker/devtools/coredns:/root
+    labels:
+      - traefik.enable=false
+    network_mode: bridge
 
   traefik:
     image: traefik:v2.9
@@ -113,8 +124,9 @@ services:
       - traefik.http.services.flex-gateway-detools.loadbalancer.server.scheme=https
     environment:
       - FLEX_NAME=devtools-flex-gateway-1
+      - FLEX_LOG_LEVEL=4
     volumes:
-      - /mnt/d/docker/flex-gateway:/usr/local/share/mulesoft/flex-gateway/conf.d
+      - /mnt/d/docker/devtools/flex-gateway:/usr/local/share/mulesoft/flex-gateway/conf.d
     depends_on:
       - traefik
     networks:

@@ -1,0 +1,7 @@
+.:53 {
+  file /root/docker.local docker.local
+  file /root/l.geekosphere.net l.geekosphere.net
+  forward . 192.168.168.250:53
+  #forward . 8.8.8.8
+  log
+}
