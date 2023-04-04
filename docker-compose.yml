@@ -120,8 +120,8 @@ services:
     labels:
       - traefik.http.routers.flex-gateway.tls=true
       - traefik.http.routers.flex-gateway.tls.certresolver=wildcard-godaddy
-      - traefik.http.services.flex-gateway-devtools.loadbalancer.server.port=8082
-      - traefik.http.services.flex-gateway-devtools.loadbalancer.server.scheme=https
+      - traefik.http.services.flex-gateway-devtools.loadbalancer.server.port=8081
+      - traefik.http.services.flex-gateway-devtools.loadbalancer.server.scheme=http
     environment:
       - FLEX_NAME=devtools-flex-gateway-1
       - FLEX_LOG_LEVEL=4
