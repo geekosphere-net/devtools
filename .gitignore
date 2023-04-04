@@ -2,3 +2,4 @@
 **/acme.json
 **/private/*key
 **/*.log
+flex-gateway/registration.yaml
