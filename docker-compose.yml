@@ -102,7 +102,7 @@ services:
 
 
   dwplay:
-    image: dnr/dwplay:V1.0.24-V2.5.0-SNAPSHOT
+    image: eliassengroup/dwplay:latest
     #image: dnr/dwplay:2.5.0-SNAPSHOT
     #image: "machaval/dw-playground:2.3.1-SNAPSHOT"
     restart: unless-stopped
@@ -120,8 +120,8 @@ services:
     labels:
       - traefik.http.routers.flex-gateway.tls=true
       - traefik.http.routers.flex-gateway.tls.certresolver=wildcard-godaddy
-      - traefik.http.services.flex-gateway-detools.loadbalancer.server.port=8082
-      - traefik.http.services.flex-gateway-detools.loadbalancer.server.scheme=https
+      - traefik.http.services.flex-gateway-devtools.loadbalancer.server.port=8082
+      - traefik.http.services.flex-gateway-devtools.loadbalancer.server.scheme=https
     environment:
       - FLEX_NAME=devtools-flex-gateway-1
       - FLEX_LOG_LEVEL=4
@@ -131,6 +131,7 @@ services:
       - traefik
     networks:
       - proxy
+
 
 networks:
   proxy:
