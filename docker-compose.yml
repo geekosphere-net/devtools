@@ -69,26 +69,6 @@ services:
       - proxy
 
 
-  hub-agent:
-    image: ghcr.io/traefik/hub-agent-traefik:v1.0.0
-    restart: on-failure
-    command:
-      - run
-      - --hub.token=${TRAEFIK_HUB_TOKEN}
-      - --auth-server.advertise-url=http://hub-agent
-      - --traefik.host=traefik
-      - --traefik.tls.insecure=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      traefik:
-        condition: service_started
-        #condition: service_healthy
-        #condition: service_completed_successfully
-    networks:
-      - proxy
-
-
   httpbin:
     image: kennethreitz/httpbin:latest
     restart: unless-stopped
