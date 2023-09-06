@@ -8,4 +8,5 @@ $ORIGIN l.geekosphere.net.
           3600       ; minimum (1 hour)				
           )
 @         IN A     192.168.168.251
-*.l.geekosphere.net.  IN A     192.168.168.251
+;*.l.geekosphere.net.  IN A     192.168.168.251
+*  IN A     192.168.168.251
